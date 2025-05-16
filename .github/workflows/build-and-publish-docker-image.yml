@@ -17,12 +17,12 @@ jobs:
       packages: write
       contents: read
     steps:
-      - name: Set up Runner
+      - name: Set up runner
         run: |
           apt-get update
           apt-get -y upgrade
           apt-get install -y sudo
-      - name: Set up Docker
+      - name: Set up docker
         run: |
           sudo apt-get install -y ca-certificates curl
           sudo install -m 0755 -d /etc/apt/keyrings
@@ -36,6 +36,7 @@ jobs:
           sudo apt-get -y upgrade
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
           sudo service docker start
+          sudo docker run --rm hello-world
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build image
