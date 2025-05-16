@@ -15,15 +15,25 @@ jobs:
     steps:
       - name: Set up env
         run: |
-          REPOSITORY_NAME=$(echo ${{ github.repository }} | sed -e 's,.*/\(.*\),\1,')
+          REPOSITORY_NAME=$(echo "${{ github.repository }}" | sed -e 's,.*/\(.*\),\1,')
           IMAGE_NAME=$(echo $REPOSITORY_NAME | sed -e 's/^template-//' -e 's/^image-//')
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+
           VERSION=demo
           [[ "${{ github.ref }}" == "refs/heads/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/^refs\/heads\///' -e 's/\//./g')
-          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-      - name: Clean up image
+
+          curl -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${{ env.IMAGE_NAME }}/versions >> $HOME/versionIds.json
+          echo "VERSION_ID=$(jq -r '.[] | select(.name == "${{ env.VERSION }}").id' $HOME/versionIds.json)" >> $GITHUB_ENV
+      - name: Clean up untagged images
         uses: actions/delete-package-versions@v5
         with:
           package-name: "${{ env.IMAGE_NAME }}"
           package-type: container
-          package-version-ids: "${{ env.VERSION }}"
+          delete-only-untagged-versions: true
+      - name: Clean up branch image
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: "${{ env.IMAGE_NAME }}"
+          package-type: container
+          package-version-ids: "${{ env.VERSION_ID }}"
