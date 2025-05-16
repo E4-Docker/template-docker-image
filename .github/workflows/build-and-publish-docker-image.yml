@@ -19,7 +19,8 @@ jobs:
     steps:
       - name: Install sudo
         run: |
-          apt-get update && apt-get upgrade
+          apt-get update
+          apt-get -y upgrade
           ap-get install -y sudo
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
