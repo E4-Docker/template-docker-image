@@ -12,32 +12,11 @@ env:
   IMAGE_NAME: image
 jobs:
   push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
     steps:
-      - name: Set up runner
-        run: |
-          apt-get update
-          apt-get -y upgrade
-          apt-get install -y sudo
-      - name: Set up docker
-        run: |
-          sudo apt-get install -y ca-certificates curl
-          sudo install -m 0755 -d /etc/apt/keyrings
-          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-          sudo chmod a+r /etc/apt/keyrings/docker.asc
-          echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-            $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
-          sudo apt-get -y upgrade
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-          sudo service docker start
-          sudo service status docker
-          sudo docker run --rm hello-world
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build image
