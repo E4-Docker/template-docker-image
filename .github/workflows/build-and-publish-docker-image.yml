@@ -17,6 +17,10 @@ jobs:
       packages: write
       contents: read
     steps:
+      - name: Install sudo
+        run: |
+          apt-get update && apt-get upgrade
+          ap-get install sudo
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
       - name: Checkout repository
