@@ -1,0 +1,29 @@
+﻿name: Clean up docker image
+
+on:
+  workflow_dispatch:
+  delete:
+    branches:
+      - feature/*
+      - hotfix/*
+      - release/*
+jobs:
+  clean_up:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Set up env
+        run: |
+          REPOSITORY_NAME=$(echo ${{ github.repository }} | sed -e 's,.*/\(.*\),\1,')
+          IMAGE_NAME=$(echo $REPOSITORY_NAME | sed -e 's/^template-//' -e 's/^image-//')
+          VERSION=demo
+          [[ "${{ github.ref }}" == "refs/heads/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/^refs\/heads\///' -e 's/\//./g')
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Clean up image
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: "${{ env.IMAGE_NAME }}"
+          package-type: container
+          package-version-ids: "${{ env.VERSION }}"
