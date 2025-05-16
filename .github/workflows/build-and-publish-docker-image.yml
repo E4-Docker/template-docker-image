@@ -22,7 +22,7 @@ jobs:
           apt-get update
           apt-get -y upgrade
           apt-get install -y sudo iptables-persistent
-          sudo -i
+          sudo su
       - name: Set up Docker
         uses: docker/setup-docker-action@v4
       - name: Checkout repository
